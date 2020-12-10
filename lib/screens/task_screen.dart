@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import '../ProviderModels/tasks.dart';
 import '../widgets/task_list.dart';
 import './add_task_screen.dart';
-import '../models/task.dart';
+import '../ProviderModels/task.dart';
+import 'package:provider/provider.dart';
 
 class TasksScreen extends StatefulWidget {
   @override
@@ -9,24 +11,10 @@ class TasksScreen extends StatefulWidget {
 }
 
 class _TasksScreenState extends State<TasksScreen> {
-  List<Task> leftTask = [];
-  List<Task> tasks = [];
-
-  void addToTasks(String name) {
-    setState(() {
-      tasks.add(Task(id: DateTime.now().toString(), name: name));
-    });
-  }
-
-  void checkboxCallback(String id) {
-    int index = tasks.indexWhere((element) => element.id == id);
-    setState(() {
-      tasks[index].toggleDone();
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
+    final tasks = Provider.of<Tasks>(context);
+    final taskData = tasks.item;
     return Scaffold(
       backgroundColor: Colors.lightBlueAccent,
       floatingActionButton: FloatingActionButton(
@@ -34,9 +22,7 @@ class _TasksScreenState extends State<TasksScreen> {
         child: Icon(Icons.add),
         onPressed: () => showModalBottomSheet(
           context: context,
-          builder: (context) => AddTaskScreen(
-            addToTasks: addToTasks,
-          ),
+          builder: (context) => AddTaskScreen(),
         ),
       ),
       body: Column(
@@ -73,7 +59,7 @@ class _TasksScreenState extends State<TasksScreen> {
                   ),
                 ),
                 Text(
-                  '${tasks.where((element) => element.isDone == false).length.toString()} tasks',
+                  '${tasks.numberOfActiveTasks()} task',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 18,
@@ -91,17 +77,14 @@ class _TasksScreenState extends State<TasksScreen> {
                   topRight: Radius.circular(20),
                 ),
               ),
-              child: tasks.length == 0
+              child: taskData.length == 0
                   ? Center(
                       child: Text(
                         'No Task left to do!',
                         style: TextStyle(color: Colors.lightBlueAccent, fontSize: 20),
                       ),
                     )
-                  : TaskList(
-                      checkboxCallback: checkboxCallback,
-                      tasks: tasks,
-                    ),
+                  : TaskList(),
             ),
           )
         ],

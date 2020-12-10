@@ -1,22 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../ProviderModels/tasks.dart';
 
 class AddTaskScreen extends StatelessWidget {
-  final Function addToTasks;
-  AddTaskScreen({this.addToTasks});
-
   final taskInputController = TextEditingController();
-
-  void sub(BuildContext context, String taskName) {
-
-    if (taskName != null) {
-      addToTasks(taskName);
-      Navigator.of(context).pop();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    final tasksData = Provider.of<Tasks>(context, listen: false);
     return SingleChildScrollView(
       child: Container(
         color: Color(0xff757575),
@@ -34,7 +25,10 @@ class AddTaskScreen extends StatelessWidget {
               ),
               TextField(
                 controller: taskInputController,
-                onSubmitted: (value) => sub(context, value),
+                onSubmitted: (value) {
+                  tasksData.addToTask(taskInputController.text);
+                  Navigator.of(context).pop();
+                } ,
                 textAlign: TextAlign.center,
                 autofocus: true,
               ),
@@ -44,7 +38,10 @@ class AddTaskScreen extends StatelessWidget {
               ButtonTheme(
                 minWidth: double.infinity,
                 child: RaisedButton(
-                  onPressed: () => sub(context, taskInputController.text),
+                  onPressed: () {
+                    tasksData.addToTask(taskInputController.text);
+                    Navigator.of(context).pop();
+                  },
                   color: Colors.lightBlueAccent,
                   child: Text(
                     'Add',
